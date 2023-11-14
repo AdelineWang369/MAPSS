@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <script src="jspsych/plugins/jspsych.js"></script>
+    <link href="jspsych/plugins/jspsych.css" rel="stylesheet" type="text/css" />
+    <script src="jspsych/plugins/plugin-preload.js"></script>
+    <script src="jspsych/plugins/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugins/plugin-image-keyboard-response.js"></script>
+    <script src="jspsych/plugins/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugins/plugin-survey-text.js"></script>
+    <script src="jspsych/plugins/plugin-fullscreen.js"></script>
+
+    <script src="Stimuli_randomizer.js"></script>
+    <script src="variables_info.js"></script>
+    <script src="Functions.js"></script>
+</head>
+<body></body>
+<script>
+    let chosen_images =[];
+    let chosen_categories =[];
+    let chosen_index =[];
+    let unchosen_images =[];
+    let unchosen_categories =[];
+    let unchosen_index =[];
+    let stat = [];
+    let option =[];
+    let optiona =[];
+    let c_index = [];
+    let u_index = [];
+    let c_stat = [];
+    let novel_chosen = [];
+    let novel_unchosen = [];
+    let chosen_unreward = [];
+    let chosen_reward = [];
+    let unchosen_unreward = [];
+    let unchosen_reward = [];
+    let chosen_category=[];
+    let unchosen_category =[];
+    let chosen_reward_category =[];
+    let chosen_unreward_category =[];
+    let unchosen_reward_category=[];
+    let unchosen_unreward_category=[];
+    let novel_variable_info=[];
+    let c_image=[];
+    let moreimage=[];
+    let u_image=[];
+    let moreimage1=[];
+    let pick2=[];
+    let h2 =[];
+    let h3=[];
+    let h4=[];
+    let h5=[];
+    let h6=[];
+    let h7=[];
+    let pick3=[];
+    let pick4=[];
+    let test_memory =[];
+
+
+    let jsPsych = initJsPsych({
+        use_webaudio: false,
+            on_finish: function () {
+                console.log(jsPsych.data.get().json());
+            },
+        }
+    );
+
+    let conditions = [
+        {image: 'Exemplars/coin.jpg', text: "This item is rewarded", status: '1', chosen:'Exemplars/coin.jpg', duration:'3000'},
+        {image: 'Exemplars/cross.jpg', text: "This item is not rewarded", status: '0',chosen:'Exemplars/cross.jpg',duration:'3000'}
+    ];
+    let prelude = [
+        {image: 'Exemplars/blank.jpg', text: "", status:'2', chosen: 'Exemplars/blank.jpg', duration: '300'}
+    ];
+    let repeated = jsPsych.randomization.repeat(conditions, 2);
+    let randomizedConditions = prelude.concat(repeated);
+    let novel_variable_info1 = [
+        {image1: 'Exemplars/blank.jpg', image2: 'Exemplars/blank.jpg', category1:'', category2:'', status:'2',duration: '50', reward_status1: '', reward_status2:'', text:'' }];
+    let novel_v_info= jsPsych.randomization.repeat(novel_variable_info1, 49);
+    let test_memory_info1 =[
+        {image: 'Exemplars/blank.jpg',pick1: 'Exemplars/blank.jpg',pick2: 'Exemplars/blank.jpg',pick3: 'Exemplars/blank.jpg',pick4: 'Exemplars/blank.jpg',status:'',text:'',text1: '', answer:'7',duration:'30',seed:'7'}]
+    let test_memory_info= jsPsych.randomization.repeat(test_memory_info1,9);
+
+    let timeline=[];
+    let deliberation = {
+        timeline: [
+            {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function () {
+                    function randomIntFromInterval(min, max) { // min and max included
+                        return Math.floor(Math.random() * (max - min + 1) + min)
+                    }
+                    let rndInt = randomIntFromInterval(1, 2);
+                    if (rndInt === 1) {
+                        return '<img alt="image1" src="' + jsPsych.timelineVariable('image1', true) + '" style="width: auto; height: auto; margin-right: 20px;">' +
+                            '<img alt="image2" src="' + jsPsych.timelineVariable('image2', true) + '" style="width: auto; height: auto; margin-left: 20px;">';
+                    } else {
+                        return '<img alt="image1" src="' + jsPsych.timelineVariable('image2', true) + '" style="width: auto; height: auto; margin-right: 20px;">' +
+                            '<img alt="image2" src="' + jsPsych.timelineVariable('image1', true) + '" style="width: auto; height: auto; margin-left: 20px;">';
+                    }
+                },
+                choices: ['J', 'K'],
+                trial_duration: 7000,
+                post_trial_gap: 300,
+                prompt: '<p style="text-align: center;font-size:30px;line-height:1.6">Which one is more valuable?<br>(J for left, K for right)</span>',
+                data: {trial_id: 'deliberation',stimulus_type: jsPsych.timelineVariable('combo')},
+                on_finish: function(data) {
+                    if (data.rt === null){
+                        data.need_warning = true;
+                    } else {
+                        data.need_warning = false;
+                        if (jsPsych.data.get().filter({stimulus_type: data.stimulus_type}).values().length > 0) {
+                            data.occurrences = jsPsych.data.get().filter({stimulus_type: data.stimulus_type}).count();
+                        } else {
+                            data.occurrences = 0;
+                        }
+                    }
+                },
+            }, {
+                timeline: [
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus: 'You did not respond to the previous trial. Please respond to this trial.',
+                        trial_duration: 2000,
+                        choices: 'NO_KEYS',
+                    },
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus: function () {
+                            function randomIntFromInterval(min, max) { // min and max included
+                                return Math.floor(Math.random() * (max - min + 1) + min)
+                            }
+                            let rndInt = randomIntFromInterval(1, 2);
+                            if (rndInt === 1) {
+                                return '<img alt="image1" src="' + jsPsych.timelineVariable('image1', true) + '" style="width: auto; height: auto; margin-right: 20px;">' +
+                                    '<img alt="image2" src="' + jsPsych.timelineVariable('image2', true) + '" style="width: auto; height: auto; margin-left: 20px;">';
+                            } else {
+                                return '<img alt="image1" src="' + jsPsych.timelineVariable('image2', true) + '" style="width: auto; height: auto; margin-right: 20px;">' +
+                                    '<img alt="image2" src="' + jsPsych.timelineVariable('image1', true) + '" style="width: auto; height: auto; margin-left: 20px;">';
+                            }
+                        },
+                        choices: ['J', 'K'],
+                        trial_duration: 5000,
+                        post_trial_gap: 300,
+                        prompt: '<p style="text-align: center;font-size:30px;line-height:1.6">Which one is more valuable?<br>(J for left, K for right)</span>',
+                        data: {trial_id: 'repeat_deliberation',stimulus_type: jsPsych.timelineVariable('combo')},
+                        on_finish: function(data) {
+                            if (data.rt === null){
+                                jsPsych.endExperiment('Thank you for participating in this experiment.');
+                            } else {
+                                if (jsPsych.data.get().filter({stimulus_type: data.stimulus_type}).values().length > 0) {
+                                    data.occurrences1 = jsPsych.data.get().filter({stimulus_type: data.stimulus_type}).count();
+                                } else {
+                                    data.occurrences1 = 0;
+                                }
+                            }
+                        },
+                    },
+                ],
+                conditional_function: function(){
+                    let data = jsPsych.data.get().last(1).values()[0];
+                    return data.need_warning;
+                }
+            },{
+                timeline: [
+                    {
+                        type: jsPsychSurveyText,
+                        questions: [
+                            {prompt: 'Why do you choosen that item?',
+                             rows: 5,
+                             name: 'reasons',
+                             required: true,
+                            }
+                        ],
+                        data: {trial_id: 'reasons'}
+                    }
+                ],
+                conditional_function: function(){
+                    let data = jsPsych.data.get().last(1).values()[0];
+                    return 2 <= data.occurrences || data.occurrences1 >= 3;
+                }
+            },
+        ],
+        timeline_variables: variables_info,
+        randomize_order: true,
+        repetitions: 2,
+    };
+    let enter_final_deliberation = {
+        type:jsPsychHtmlKeyboardResponse,
+        stimulus: '<p style="text-align: center;font-size:40px">Now you make the last decisions.</span>',
+        choices: "NO_KEYS",
+        trial_duration: 3000,
+    };
+    let final_deliberation = {
+        timeline: [
+            {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function () {
+                        return '<img alt="finalimage1" src="' + jsPsych.timelineVariable('image1', true) + '" style="width: auto; height: auto; margin-right: 20px;" >' +
+                            '<img alt="finalimage2" src="' + jsPsych.timelineVariable('image2', true) + '" style="width: auto; height: auto; margin-left: 20px;">';
+                },
+                choices: ['J', 'K'],
+                post_trial_gap: 300,
+                data: {trial_id: 'final_deliberation',stimulus_type: jsPsych.timelineVariable('combo')},
+                on_finish: function(data) {
+                    if (jsPsych.pluginAPI.compareKeys(data.response, 'J')) {
+                        chosen_images.push(jsPsych.timelineVariable('image1'));
+                        unchosen_images.push(jsPsych.timelineVariable('image2'));
+                        chosen_categories.push(jsPsych.timelineVariable('category1'));
+                        unchosen_categories.push(jsPsych.timelineVariable('category2'));
+                        chosen_index.push(jsPsych.timelineVariable('index1'));
+                        unchosen_index.push(jsPsych.timelineVariable('index2'));
+                    } else if (jsPsych.pluginAPI.compareKeys(data.response, 'K')) {
+                        chosen_images.push(jsPsych.timelineVariable('image2'));
+                        unchosen_images.push(jsPsych.timelineVariable('image1'));
+                        chosen_categories.push(jsPsych.timelineVariable('category2'));
+                        unchosen_categories.push(jsPsych.timelineVariable('category1'));
+                        chosen_index.push(jsPsych.timelineVariable('index2'));
+                        unchosen_index.push(jsPsych.timelineVariable('index1'));
+                    }
+                    data.chosen_images = chosen_images;
+                    data.unchosen_images = unchosen_images;
+                    data.chosen_categories = chosen_categories;
+                    data.unchosen_categories = unchosen_categories;
+                    data.chosen_index = chosen_index;
+                    data.unchosen_index = unchosen_index;
+                }
+                },
+            ],
+        timeline_variables: variables_info,
+        randomize_order: true,
+    };
+    let enter_reward_learning = {
+        type:jsPsychHtmlKeyboardResponse,
+            stimulus: '<p style="text-align: center;font-size:40px">Now you will learn the outcomes of your choices</span>',
+        choices: "NO_KEYS",
+        trial_duration: 3000,
+    };
+    let reward_learning = {
+        timeline: [
+           {
+                type: jsPsychHtmlKeyboardResponse,
+                choices: 'NO_KEYS',
+                trial_duration: jsPsych.timelineVariable('duration'),
+                stimulus: function () {
+                    return '<img alt="result" id ="result" src="'+jsPsych.timelineVariable('chosen')+'" style="position: absolute; top: 50%; left: 20%; transform: translateY(-50%);width: auto; height: auto;">'
+                },
+                prompt: function () {
+                    return '<img alt="coin" id ="coin" src=" ' + jsPsych.timelineVariable('image') + '" style="position: absolute; right: 20%; top: 50%; transform: translateY(-50%); width: 300px; height: 300px; visibility: hidden">' +
+                        '<p id="prompt" style="position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); font-size: 30px;visibility: hidden">' + jsPsych.timelineVariable('text') + '</p>'
+                },
+                data: {trial_id: 'reward_learning',stimulus_type:jsPsych.timelineVariable('status')},
+                on_load: function() {
+                        setTimeout(function() {
+                            document.getElementById('prompt').style.visibility = "visible";
+                        }, 1000);
+                    setTimeout(function() {
+                        document.getElementById('coin').style.visibility = "visible";
+                    }, 1000);
+                },
+                on_start: function (trial) {
+                        let data = jsPsych.data.get().filter({trial_id: 'final_deliberation'}).last().values()[0];
+                         option = data.chosen_images;
+                    for (let i = 0; i < randomizedConditions.length; i++) {
+                        if (i === 0) {
+                            randomizedConditions[i].chosen = option[i];
+                            } else {
+                            randomizedConditions[i].chosen = option[i-1];
+                        }
+                    }
+                },
+               on_finish: function (data) {
+                   stat.push(data.stimulus_type);
+                   data.stat = stat.slice(-4);
+                   }
+            },
+    ],
+       timeline_variables: randomizedConditions,
+    };
+    let enter_value_judgement = {
+        type:jsPsychHtmlKeyboardResponse,
+        stimulus: '<p style="text-align: center;font-size:40px">phase 3</span>',
+        choices: "NO_KEYS",
+        trial_duration: 3000,
+        data: {trial_id: 'enter_value_judgement'},
+        on_finish: function (data) {
+            let data1 = jsPsych.data.get().filter({trial_id: 'final_deliberation'}).last().values()[0];
+            let data2 = jsPsych.data.get().filter({trial_id: 'reward_learning'}).last().values()[0];
+            c_index = data1.chosen_index;
+            u_index = data1.unchosen_index;
+            c_stat = data2.stat;
+            for (let a = 0; a <4; a++) {
+                novel_chosen.push(novel[c_index[a]]);
+                chosen_category.push(names[c_index[a]]);
+                novel_unchosen.push(novel[u_index[a]]);
+                unchosen_category.push(names[u_index[a]]);
+            }
+            for (let b = 0; b<4; ++b) {
+                if (c_stat[b] === "0"){
+                    chosen_unreward.push(novel_chosen[b])
+                    chosen_unreward_category.push(chosen_category[b])
+                    unchosen_unreward.push(novel_unchosen[b])
+                    unchosen_unreward_category.push(unchosen_category[b])
+                }else if (c_stat[b] === "1") {
+                    chosen_reward.push(novel_chosen[b])
+                    chosen_reward_category.push(chosen_category[b])
+                    unchosen_reward.push(novel_unchosen[b])
+                    unchosen_reward_category.push(unchosen_category[b])
+                }
+            }
+                    for (let y = 0; y<2; y++) {
+                        for (let x = 0; x<2; x++) {
+                            for (let m = 0; m < 6; m++) {
+                                function randomIntFromInterval(min, max) { // min and max included
+                                    return Math.floor(Math.random() * (max - min + 1) + min)
+                                }
+                                let rndInt = randomIntFromInterval(1, 2);
+                                if (rndInt === 1) {
+                                    novel_variable_info.push({
+                                        image1: chosen_reward[y][m],
+                                        status: '10',
+                                        image2: chosen_unreward[x][m],
+                                        reward_status1: 'reward',
+                                        reward_status2: 'unreward',
+                                        category1: chosen_reward_category[y],
+                                        category2: chosen_unreward_category[x],
+                                        duration: '7000',
+                                        text: '<p style="text-align: center;font-size:30px;line-height:1.6">Which one is more valuable?<br>(J for left, K for right)</span>',
+                                    })
+                                } else if (rndInt === 2) {
+                                    novel_variable_info.push({
+                                        image1: chosen_unreward[x][m],
+                                        duration: '7000',
+                                        status: '10',
+                                        category1: chosen_unreward_category[x],
+                                        category2: chosen_reward_category[y],
+                                        image2: chosen_reward[y][m],
+                                        reward_status1: 'unreward',
+                                        reward_status2: 'reward',
+                                        text: '<p style="text-align: center;font-size:30px;line-height:1.6">Which one is more valuable?<br>(J for left, K for right)</span>',
+                                    })
+                                }
+                            }
+                        }
+                        }
+                    for (let y = 0; y<2; y++) {
+                        for (let x = 0; x<2; x++) {
+                            for (let m = 0; m < 6; m++) {
+                                let rndInt = randomIntFromInterval(1, 2)
+                                if (rndInt === 1) {
+                                    novel_variable_info.push({
+                                        image1: unchosen_reward[y][m],
+                                        duration: '7000',
+                                        image2: unchosen_unreward[x][m],
+                                        status: '11',
+                                        category1: unchosen_reward_category[y],
+                                        category2: unchosen_unreward_category[x],
+                                        reward_status1: 'reward',
+                                        reward_status2: 'unreward',
+                                        text: '<p style="text-align: center;font-size:30px;line-height:1.6">Which one is more valuable?<br>(J for left, K for right)</span>',
+                                    })
+                                } else if (rndInt === 2) {
+                                    novel_variable_info.push({
+                                        image1: unchosen_unreward[x][m],
+                                        image2: unchosen_reward[y][m],
+                                        reward_status1: 'unreward',
+                                        reward_status2: 'reward',
+                                        status: '11',
+                                        category1: unchosen_unreward_category[x],
+                                        category2: unchosen_reward_category[y],
+                                        duration: '7000',
+                                        text: '<p style="text-align: center;font-size:30px;line-height:1.6">Which one is more valuable?<br>(J for left, K for right)</span>',
+                                    })
+                                }
+                            }
+                        }
+                        }
+            data.novel_variable_info=novel_variable_info;
+        }
+    };
+    let value_judgement = {
+        timeline:[
+            {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function () {
+                    return '<img alt="finalimage1" src="' + jsPsych.timelineVariable('image1') + '" style="width: auto; height: auto; margin-right: 20px;" >' +
+                        '<img alt="finalimage2" src="' + jsPsych.timelineVariable('image2') + '" style="width: auto; height: auto; margin-left: 20px;">';
+                },
+                choices: ['J', 'K'],
+                trial_duration: jsPsych.timelineVariable('duration'),
+                post_trial_gap: '300',
+                prompt: jsPsych.timelineVariable('text'),
+                data: {trial_id: 'value_judgement',stimulus_type: jsPsych.timelineVariable('status'),
+                    leftside_category:jsPsych.timelineVariable('category1'), rightside_category:jsPsych.timelineVariable('category2'),
+                    lefside_rewardstatus:jsPsych.timelineVariable('reward_status1'),rightside_rewardstatus:jsPsych.timelineVariable('reward_status2')},
+                on_start: function (trial) {
+                    let data4 = jsPsych.data.get().filter({trial_id: 'enter_value_judgement'}).last().values()[0];
+                    option = data4.novel_variable_info;
+                    for (let i = 0; i < novel_v_info.length; i++) {
+                        if (i !== 0) {
+                            novel_v_info[i]=option[i-1];
+                        }
+                    }
+                },
+            }
+
+    ],
+        timeline_variables: novel_v_info,
+        randomize_order: true,
+    };
+    let enter_memory_test = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<p style="text-align: center;font-size:40px">phase 4</span>',
+        choices: "NO_KEYS",
+        trial_duration: 3000,
+        data: {trial_id: 'enter_memory_test'},
+        on_finish: function (data) {
+            let data5 = jsPsych.data.get().filter({trial_id: 'final_deliberation'}).last().values()[0];
+            c_index = data5.chosen_index;
+            u_index = data5.unchosen_index;
+            c_image = data5.chosen_images;
+            u_image = data5.unchosen_images;
+            for (let a = 0; a <4; a++) {
+                moreimage.push(test[c_index[a]]);
+                moreimage1.push(test[u_index[a]]);
+            }
+            for (let m = 0; m < 4; m++) {
+                function randomIntFromInterval(min, max) { // min and max included
+                    return Math.floor(Math.random() * (max - min + 1) + min)
+                }
+                let rndN = randomIntFromInterval(0, 3);
+                c_image.push(moreimage[m][rndN]);
+                u_image.push(moreimage1[m][rndN]);
+                h2.push(moreimage1[m][4]);
+                h3.push(moreimage1[m][5]);
+            }
+            pick2=h2.concat(h3);
+            for (let n =0; n<4; n++){
+                h6.push(mem[n][0]);
+                h7.push(mem[n][1]);
+                h4.push(mem[n][2]);
+                h5.push(mem[n][3]);
+            }
+            pick3=h6.concat(h7);
+            pick4=h4.concat(h5);
+            for (x= 0; x<8; x++) {
+                if (x<4) {
+                    function randomIntFromInterval(min, max) { // min and max included
+                        return Math.floor(Math.random() * (max - min + 1) + min)
+                    }
+                    let seed = randomIntFromInterval(1,4);
+                    if (seed === 1){
+                        test_memory.push({
+                        image: c_image[x],
+                        pick1: u_image[x],
+                        pick2: pick2[x],
+                        pick3: pick3[x],
+                        pick4: pick4[x],
+                        status: '100',
+                        answer:'1',
+                        seed:'1',
+                        duration: '90000',
+                        text: '<p style="text-align: center;font-size:30px;line-height:1.6">Have you seen this during Phase 1?<br>(1 for yes, 0 for no)</span>',
+                        text1: '<p style="text-align: center;font-size:25px;line-height:1.6">Which one is it paired with?<br>(1 for the 1st image, 2 for the 2nd image, <br>3 for the 3rd image, 4 for the 4th image)</span>',
+                    })}else if (seed === 2){
+                        test_memory.push({
+                            image: c_image[x],
+                            pick1: pick2[x],
+                            pick2: u_image[x],
+                            pick3: pick3[x],
+                            pick4: pick4[x],
+                            status: '100',
+                            answer:'1',
+                            seed:'2',
+                            duration: '90000',
+                            text: '<p style="text-align: center;font-size:30px;line-height:1.6">Have you seen this during Phase 1?<br>(1 for yes, 0 for no)</span>',
+                            text1: '<p style="text-align: center;font-size:25px;line-height:1.6">Which one is it paired with?<br>(1 for the 1st image, 2 for the 2nd image, <br>3 for the 3rd image, 4 for the 4th image)</span>',
+                        })}else if (seed === 3){
+                        test_memory.push({
+                            image: c_image[x],
+                            pick1: pick2[x],
+                            pick2: pick3[x],
+                            pick3: u_image[x],
+                            pick4: pick4[x],
+                            status: '100',
+                            answer:'1',
+                            seed:'3',
+                            duration: '90000',
+                            text: '<p style="text-align: center;font-size:30px;line-height:1.6">Have you seen this during Phase 1?<br>(1 for yes, 0 for no)</span>',
+                            text1: '<p style="text-align: center;font-size:25px;line-height:1.6">Which one is it paired with?<br>(1 for the 1st image, 2 for the 2nd image, <br>3 for the 3rd image, 4 for the 4th image)</span>',
+                        })}else if (seed === 4){
+                        test_memory.push({
+                            image: c_image[x],
+                            pick1: pick2[x],
+                            pick2: pick4[x],
+                            pick3: pick3[x],
+                            pick4: u_image[x],
+                            status: '100',
+                            answer:'1',
+                            seed:'4',
+                            duration: '90000',
+                            text: '<p style="text-align: center;font-size:30px;line-height:1.6">Have you seen this during Phase 1?<br>(1 for yes, 0 for no)</span>',
+                            text1: '<p style="text-align: center;font-size:25px;line-height:1.6">Which one is it paired with?<br>(1 for the 1st image, 2 for the 2nd image, <br>3 for the 3rd image, 4 for the 4th image)</span>',
+                        })}
+                }else {
+                    test_memory.push({
+                        image: c_image[x],
+                        pick1: u_image[x],
+                        pick2: pick2[x],
+                        pick3: pick3[x],
+                        pick4: pick4[x],
+                        status: '101',
+                        answer:'0',
+                        seed:'7',
+                        duration: '90000',
+                        text: '<p style="text-align: center;font-size:30px;line-height:1.6">Have you seen this during Phase 1?<br>(1 for yes, 0 for no)</span>',
+                        text1: '<p style="text-align: center;font-size:25px;line-height:1.6">Which one is it paired with?<br>(1 for the 1st image, 2 for the 2nd image, <br>3 for the 3rd image, 4 for the 4th image)</span>',
+                    })
+                }
+            }
+            data.test_memory=test_memory;
+        }
+    };
+    let memory_test = {
+        timeline: [
+            {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function () {
+                    return '<img id="test_image" alt="image1" src="' + jsPsych.timelineVariable('image') + '" style="width: auto; height: auto; margin-right: 20px;">'
+                },
+                prompt:jsPsych.timelineVariable('text'),
+                choices:['1','0'],
+                trial_duration: jsPsych.timelineVariable('duration'),
+                data: {trial_id: 'memory_test',stimulus_type:jsPsych.timelineVariable('status'),answer:jsPsych.timelineVariable('answer')},
+                on_start: function (trial) {
+                    let data5= jsPsych.data.get().filter({trial_id: 'enter_memory_test'}).last().values()[0];
+                    optiona = data5.test_memory
+                    for (let i = 0; i < test_memory_info.length; i++) {
+                        if (i !== 0) {
+                            test_memory_info[i]=optiona[i-1];
+                        }
+                    }
+                },
+                on_finish: function(data) {
+                        if (parseInt(data.stimulus_type) === parseInt(100)) {
+                            if (parseInt(data.answer) === parseInt(data.response)) {
+                                data.need_picking = true;
+                                data.chosen = true;
+                                data.memoribility = true;
+                            } else {
+                                data.need_picking = false;
+                                data.chosen = true;
+                                data.memoribility = false;
+                            }
+                        } else {
+                            if (parseInt(data.answer) === parseInt(data.response)) {
+                                data.need_picking = false;
+                                data.chosen = false;
+                                data.memoribility = true;
+                            } else {
+                                data.need_picking = false;
+                                data.chosen = false;
+                                data.memoribility = false;
+                            }
+                        }
+                },
+            }, {
+            timeline:[{
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function () {
+                    return '<img id="pick_image" alt="finalimage1" src="' + jsPsych.timelineVariable('pick1') + '" style="width: auto; height: auto;" >' +
+                        '<img id="pick_image" alt="finalimage2" src="' + jsPsych.timelineVariable('pick2') + '" style="width: auto; height: auto;">' +
+                        '<img id="pick_image" alt="finalimage3" src="' + jsPsych.timelineVariable('pick3') + '" style="width: auto; height: auto;" >' +
+                        '<img id="pick_image" alt="finalimage4" src="' + jsPsych.timelineVariable('pick4') + '" style="width: auto; height: auto;">';
+                },
+                choices:['1','2','3','4'],
+                prompt:jsPsych.timelineVariable('text1'),
+                trial_duration: jsPsych.timelineVariable('duration'),
+                data: {trial_id: 'pick_pair',seed:jsPsych.timelineVariable('seed')},
+                on_finish: function(data){
+                    if (data.response === data.seed){
+                        data.correct = true;
+                    } else {
+                        data.correct = false;
+                    }
+                },
+                },
+            ],
+                conditional_function: function(){
+                    let data = jsPsych.data.get().last(1).values()[0];
+                    return data.need_picking;
+            }
+            },
+        ],
+        timeline_variables:test_memory_info,
+        randomize_order: true,
+    };
+
+
+
+    jsPsych.run([deliberation,enter_final_deliberation,final_deliberation,enter_reward_learning,reward_learning,enter_value_judgement,
+        value_judgement,enter_memory_test,memory_test]);
+
+</script>
+
+</html>
